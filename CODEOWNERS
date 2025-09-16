@@ -1,0 +1,14 @@
+# Global owners
+*       @goodcombinator/platform
+
+# Specific directories
+contexts/FL1-construction-manufacturing.yaml   @goodcombinator/fl1
+contexts/FL2-science-medicine.yaml             @goodcombinator/fl2
+contexts/FL3-it-datascience.yaml              @goodcombinator/fl3
+contexts/FL4-business-legal-marketing.yaml    @goodcombinator/fl4
+contexts/FL5-government-global.yaml           @goodcombinator/fl5
+verticals/FL1/                                 @goodcombinator/fl1
+verticals/FL2/                                 @goodcombinator/fl2
+verticals/FL3/                                 @goodcombinator/fl3
+verticals/FL4/                                 @goodcombinator/fl4
+verticals/FL5/                                 @goodcombinator/fl5
