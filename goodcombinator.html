@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoodCombinator — The Agent Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg-card:#12121a;--bg-card-hover:#1a1a26;--bg-surface:#16161f;
+  --text:#e8e8ed;--text-secondary:#9494a8;--text-muted:#5e5e72;
+  --accent:#4f8cff;--accent-hover:#6da0ff;--accent-dim:rgba(79,140,255,.12);
+  --green:#34d399;--green-dim:rgba(52,211,153,.12);
+  --amber:#fbbf24;--amber-dim:rgba(251,191,36,.12);
+  --rose:#f87171;--rose-dim:rgba(248,113,113,.12);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,.12);
+  --border:#1e1e2e;--border-hover:#2a2a3e;
+  --radius:10px;--radius-lg:16px;
+  --font:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --max-w:1200px;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent-hover)}
+img{max-width:100%;display:block}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:3px}
+
+/* ===== NAV ===== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:all .3s}
+.nav.scrolled{background:rgba(10,10,15,.96);box-shadow:0 2px 20px rgba(0,0,0,.3)}
+.nav-inner{max-width:var(--max-w);margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
+.nav-brand .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:8px;display:grid;place-items:center;font-size:.85rem;color:#fff;font-weight:700}
+.nav-links{display:flex;gap:4px;align-items:center}
+.nav-links a{padding:8px 14px;border-radius:8px;font-size:.875rem;color:var(--text-secondary);font-weight:500;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);background:var(--accent-dim)}
+.nav-cta{padding:8px 18px;background:var(--accent);color:#fff;border-radius:8px;font-size:.875rem;font-weight:600;border:none;cursor:pointer;transition:all .2s}
+.nav-cta:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;padding:8px}
+
+/* ===== HERO ===== */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:100px 24px 60px}
+.hero-grid-bg{position:absolute;inset:0;background-image:
+  radial-gradient(circle at 20% 30%,rgba(79,140,255,.08) 0%,transparent 50%),
+  radial-gradient(circle at 80% 70%,rgba(167,139,250,.06) 0%,transparent 50%);
+  pointer-events:none}
+.hero-grid-lines{position:absolute;inset:0;background-size:60px 60px;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);opacity:.3;pointer-events:none}
+.hero-inner{max-width:var(--max-w);margin:0 auto;width:100%;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:var(--accent-dim);border:1px solid rgba(79,140,255,.2);border-radius:20px;font-size:.8rem;color:var(--accent);font-weight:500;margin-bottom:24px}
+.hero-badge .pulse{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(2.4rem,5.5vw,4.2rem);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:20px;max-width:800px}
+.hero h1 .gradient{background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(1rem,2vw,1.2rem);color:var(--text-secondary);max-width:600px;margin-bottom:36px;line-height:1.7}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;border:none;transition:all .25s;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,140,255,.25);color:#fff}
+.btn-secondary{background:var(--bg-surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:700px}
+.hero-stat{text-align:left}
+.hero-stat .num{font-size:1.8rem;font-weight:700;letter-spacing:-.02em;font-family:var(--mono)}
+.hero-stat .num.blue{color:var(--accent)}
+.hero-stat .num.green{color:var(--green)}
+.hero-stat .num.amber{color:var(--amber)}
+.hero-stat .num.purple{color:var(--purple)}
+.hero-stat .label{font-size:.78rem;color:var(--text-muted);margin-top:2px}
+
+/* ===== SECTIONS ===== */
+section{padding:100px 24px}
+.section-inner{max-width:var(--max-w);margin:0 auto}
+.section-label{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px}
+.section-title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-.02em;margin-bottom:16px;line-height:1.2}
+.section-desc{font-size:1.05rem;color:var(--text-secondary);max-width:600px;margin-bottom:48px;line-height:1.7}
+
+/* ===== HOW IT WORKS ===== */
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative;transition:all .3s;overflow:hidden}
+.step-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:var(--shadow)}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--purple));opacity:0;transition:opacity .3s}
+.step-card:hover::before{opacity:1}
+.step-num{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:.9rem;margin-bottom:20px;font-family:var(--mono)}
+.step-num.s1{background:var(--accent-dim);color:var(--accent)}
+.step-num.s2{background:var(--green-dim);color:var(--green)}
+.step-num.s3{background:var(--purple-dim);color:var(--purple)}
+.step-card h3{font-size:1.15rem;font-weight:600;margin-bottom:10px}
+.step-card p{font-size:.9rem;color:var(--text-secondary);line-height:1.6}
+
+/* ===== TABS SECTION ===== */
+.tabs-wrapper{margin-bottom:32px}
+.tabs{display:flex;gap:4px;border:1px solid var(--border);border-radius:12px;padding:4px;background:var(--bg-card);width:fit-content}
+.tab-btn{padding:10px 22px;border-radius:8px;font-size:.875rem;font-weight:500;color:var(--text-secondary);background:none;border:none;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.tab-btn.active{background:var(--accent);color:#fff}
+.tab-btn:hover:not(.active){color:var(--text);background:var(--bg-surface)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ===== USE CASES ===== */
+.use-cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.use-case-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;cursor:pointer;transition:all .3s;position:relative}
+.use-case-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.use-case-icon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:1.1rem;margin-bottom:14px}
+.use-case-card h4{font-size:.95rem;font-weight:600;margin-bottom:6px}
+.use-case-card p{font-size:.82rem;color:var(--text-secondary);line-height:1.5}
+.use-case-tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:.7rem;font-weight:600;margin-top:10px}
+.tag-healthcare{background:var(--green-dim);color:var(--green)}
+.tag-fintech{background:var(--accent-dim);color:var(--accent)}
+.tag-realestate{background:var(--amber-dim);color:var(--amber)}
+.tag-education{background:var(--purple-dim);color:var(--purple)}
+.tag-supply{background:var(--rose-dim);color:var(--rose)}
+
+/* ===== AUDIENCE CARDS ===== */
+.audience-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.audience-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px;transition:all .3s;position:relative;overflow:hidden}
+.audience-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.audience-card .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+.audience-card.enterprise .badge{background:var(--accent-dim);color:var(--accent)}
+.audience-card.vendor .badge{background:var(--green-dim);color:var(--green)}
+.audience-card h3{font-size:1.4rem;font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
+.audience-card .desc{font-size:.9rem;color:var(--text-secondary);margin-bottom:20px;line-height:1.6}
+.feature-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.feature-list li{display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:var(--text-secondary)}
+.feature-list li i{color:var(--accent);margin-top:3px;font-size:.75rem}
+
+/* ===== WHY SECTION ===== */
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.why-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:left;transition:all .3s}
+.why-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.why-card .icon{width:40px;height:40px;border-radius:10px;background:var(--accent-dim);color:var(--accent);display:grid;place-items:center;font-size:1rem;margin-bottom:14px}
+.why-card h4{font-size:.95rem;font-weight:600;margin-bottom:6px}
+.why-card p{font-size:.82rem;color:var(--text-secondary);line-height:1.5}
+
+/* ===== INTERACTIVE EXPLORER ===== */
+.explorer-container{display:grid;grid-template-columns:260px 1fr;gap:24px;min-height:500px}
+.explorer-sidebar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;overflow-y:auto}
+.explorer-sidebar h4{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:8px 12px;margin-bottom:4px}
+.sector-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;border-radius:8px;color:var(--text-secondary);font-size:.875rem;font-weight:500;cursor:pointer;transition:all .2s;text-align:left;font-family:var(--font)}
+.sector-btn:hover{background:var(--bg-surface);color:var(--text)}
+.sector-btn.active{background:var(--accent-dim);color:var(--accent)}
+.sector-btn i{width:20px;text-align:center;font-size:.85rem}
+.explorer-main{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;overflow-y:auto}
+.explorer-main h3{font-size:1.3rem;font-weight:700;margin-bottom:8px}
+.explorer-main .sector-desc{color:var(--text-secondary);font-size:.92rem;margin-bottom:24px;line-height:1.6}
+.case-item{border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;transition:all .3s;cursor:pointer}
+.case-item:hover{border-color:var(--accent);background:var(--bg-card-hover)}
+.case-item h5{font-size:.95rem;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.case-item p{font-size:.84rem;color:var(--text-secondary);line-height:1.5}
+.case-item .example{font-size:.8rem;color:var(--text-muted);margin-top:8px;font-style:italic}
+.adoption-badge{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:600;text-transform:uppercase}
+.adoption-early{background:var(--amber-dim);color:var(--amber)}
+.adoption-growing{background:var(--green-dim);color:var(--green)}
+.adoption-mature{background:var(--accent-dim);color:var(--accent)}
+
+/* ===== DASHBOARD PREVIEW ===== */
+.dashboard-preview{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.dash-header{padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.dash-header h4{font-size:1rem;font-weight:600}
+.dash-status{display:flex;gap:8px}
+.dash-dot{width:10px;height:10px;border-radius:50%}
+.dash-body{padding:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.dash-metric{background:var(--bg-surface);border-radius:var(--radius);padding:20px}
+.dash-metric .metric-label{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.dash-metric .metric-val{font-size:1.6rem;font-weight:700;font-family:var(--mono)}
+.dash-metric .metric-change{font-size:.78rem;margin-top:4px;display:flex;align-items:center;gap:4px}
+.metric-up{color:var(--green)}
+.metric-down{color:var(--rose)}
+.dash-chart{grid-column:span 3;background:var(--bg-surface);border-radius:var(--radius);padding:20px;height:200px;position:relative;overflow:hidden}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:20px}
+.chart-bar{flex:1;border-radius:4px 4px 0 0;transition:height .8s ease;position:relative}
+.chart-bar:hover{opacity:.8}
+.chart-bar .bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:.65rem;color:var(--text-muted);white-space:nowrap}
+
+/* ===== CTA ===== */
+.cta-section{background:linear-gradient(135deg,rgba(79,140,255,.08),rgba(167,139,250,.08));border:1px solid rgba(79,140,255,.15);border-radius:var(--radius-lg);padding:60px 40px;text-align:center;max-width:var(--max-w);margin:0 auto}
+.cta-section h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;margin-bottom:12px}
+.cta-section p{color:var(--text-secondary);margin-bottom:28px;font-size:1.05rem}
+.cta-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.trust-badges{display:flex;gap:20px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+.trust-badge{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted)}
+.trust-badge i{color:var(--green);font-size:.75rem}
+
+/* ===== INTAKE MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(5,5,10,.8);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:580px;max-height:90vh;overflow-y:auto;position:relative;animation:modalIn .3s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:6px;border-radius:6px;transition:all .2s;z-index:2}
+.modal-close:hover{color:var(--text);background:var(--bg-surface)}
+.modal-header{padding:32px 32px 0;text-align:center}
+.modal-header h3{font-size:1.4rem;font-weight:700;margin-bottom:4px}
+.modal-header p{font-size:.88rem;color:var(--text-secondary);margin-bottom:0}
+.modal-progress{display:flex;gap:6px;padding:20px 32px 0;justify-content:center}
+.modal-progress .prog-dot{width:40px;height:4px;border-radius:2px;background:var(--border);transition:all .3s}
+.modal-progress .prog-dot.active{background:var(--accent)}
+.modal-progress .prog-dot.done{background:var(--green)}
+.modal-body{padding:24px 32px 32px}
+.form-step{display:none}
+.form-step.active{display:block}
+.form-step h4{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.82rem;font-weight:500;color:var(--text-secondary);margin-bottom:6px}
+.form-group label .req{color:var(--rose);margin-left:2px}
+.form-input{width:100%;padding:10px 14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem;font-family:var(--font);transition:all .2s;outline:none}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.form-input::placeholder{color:var(--text-muted)}
+.form-input.error{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-dim)}
+.form-error{font-size:.75rem;color:var(--rose);margin-top:4px;display:none}
+.form-error.show{display:block}
+select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235e5e72'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+select.form-input option{background:var(--bg-card);color:var(--text)}
+textarea.form-input{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.checkbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.checkbox-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:.84rem;color:var(--text-secondary)}
+.checkbox-item:hover{border-color:var(--accent-hover);color:var(--text)}
+.checkbox-item.checked{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.checkbox-item input{display:none}
+.checkbox-item .cb-icon{width:16px;height:16px;border:2px solid var(--border);border-radius:4px;display:grid;place-items:center;font-size:.6rem;transition:all .2s;flex-shrink:0}
+.checkbox-item.checked .cb-icon{border-color:var(--accent);background:var(--accent);color:#fff}
+.modal-footer{padding:0 32px 28px;display:flex;justify-content:space-between;gap:12px}
+.modal-footer .btn{flex:1;justify-content:center}
+.btn-ghost{background:none;color:var(--text-secondary);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--text-muted);color:var(--text)}
+.modal-success{display:none;text-align:center;padding:48px 32px}
+.modal-success.active{display:block}
+.modal-success .success-icon{width:64px;height:64px;border-radius:50%;background:var(--green-dim);color:var(--green);display:grid;place-items:center;font-size:1.6rem;margin:0 auto 20px}
+.modal-success h3{font-size:1.3rem;font-weight:700;margin-bottom:8px}
+.modal-success p{font-size:.9rem;color:var(--text-secondary);line-height:1.6;margin-bottom:24px}
+@media(max-width:768px){
+  .modal{max-width:100%;margin:10px;max-height:95vh}
+  .modal-header,.modal-body,.modal-footer{padding-left:20px;padding-right:20px}
+  .form-row,.checkbox-grid{grid-template-columns:1fr}
+  .modal-footer{flex-direction:column}
+  .modal-footer .btn{width:100%}
+}
+
+/* ===== FOOTER ===== */
+footer{border-top:1px solid var(--border);padding:48px 24px;margin-top:60px}
+.footer-inner{max-width:var(--max-w);margin:0 auto;display:grid;grid-template-columns:2fr repeat(3,1fr);gap:40px}
+.footer-brand{font-weight:700;font-size:1.05rem;margin-bottom:10px}
+.footer-tagline{font-size:.85rem;color:var(--text-muted);line-height:1.5}
+.footer-col h5{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:14px}
+.footer-col a{display:block;font-size:.88rem;color:var(--text-secondary);padding:3px 0;transition:color .2s}
+.footer-col a:hover{color:var(--accent)}
+.footer-bottom{max-width:var(--max-w);margin:24px auto 0;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--text-muted)}
+
+/* ===== MOBILE NAV OVERLAY ===== */
+.mobile-nav{display:none;position:fixed;inset:0;z-index:200;background:rgba(10,10,15,.95);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.mobile-nav.open{display:flex}
+.mobile-nav a{font-size:1.2rem;padding:14px 24px;color:var(--text-secondary);font-weight:500;transition:color .2s}
+.mobile-nav a:hover{color:var(--accent)}
+.mobile-nav-close{position:absolute;top:20px;right:20px;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;z-index:201;padding:8px}
+
+/* ===== ANIMATE ON SCROLL ===== */
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .steps-grid{grid-template-columns:1fr}
+  .audience-grid{grid-template-columns:1fr}
+  .why-grid{grid-template-columns:repeat(2,1fr)}
+  .explorer-container{grid-template-columns:1fr}
+  .explorer-sidebar{max-height:200px}
+  .dash-body{grid-template-columns:1fr}
+  .dash-chart{grid-column:span 1}
+  .footer-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none}
+  .hamburger{display:block}
+  .hero{padding:90px 20px 50px}
+  .hero h1{font-size:2rem}
+  .hero-stats{grid-template-columns:repeat(2,1fr);gap:12px}
+  .hero-stat .num{font-size:1.4rem}
+  section{padding:60px 16px}
+  .tabs{flex-wrap:wrap;width:100%}
+  .tab-btn{flex:1;text-align:center;padding:8px 12px;font-size:.8rem}
+  .why-grid{grid-template-columns:1fr}
+  .cta-section{padding:40px 20px}
+  .footer-inner{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;gap:8px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">
+      <div class="logo-icon">GC</div>
+      <span>GoodCombinator</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how" class="active">How It Works</a>
+      <a href="#solutions">Solutions</a>
+      <a href="#explorer">Use Cases</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#start">Get Started</a>
+    </div>
+    <button class="nav-cta" onclick="openModal('audit')">Launch Audit</button>
+    <button class="hamburger" onclick="toggleMobile()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav" aria-hidden="true" role="dialog" aria-label="Mobile navigation menu">
+  <button class="mobile-nav-close" onclick="toggleMobile()" aria-label="Close menu"><i class="fas fa-times"></i></button>
+  <a href="#how" onclick="mobileNav(event, '#how')">How It Works</a>
+  <a href="#solutions" onclick="mobileNav(event, '#solutions')">Solutions</a>
+  <a href="#explorer" onclick="mobileNav(event, '#explorer')">Use Cases</a>
+  <a href="#dashboard" onclick="mobileNav(event, '#dashboard')">Dashboard</a>
+  <a href="#start" onclick="mobileNav(event, '#start')">Get Started</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="pulse"></span> Agent Marketplace — Live</div>
+    <h1>Map Opportunities. Match Partners.<br><span class="gradient">Launch AI Agents.</span></h1>
+    <p class="hero-sub">GoodCombinator finds, funds, and fast-tracks the AI agents that matter most to your P&L — no guesswork, no endless pilots. The enterprise on-ramp to the agentic future.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="openModal('audit')"><i class="fas fa-bolt"></i> Start Agent Readiness Audit</button>
+      <button class="btn btn-secondary" onclick="smoothScroll('#explorer')"><i class="fas fa-compass"></i> Explore Use Cases</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num blue" data-target="1.2" data-prefix="$" data-suffix="B">$0B</div><div class="label">Projects Sourced</div></div>
+      <div class="hero-stat"><div class="num green" data-target="86" data-suffix="%">0%</div><div class="label">Faster PoCs</div></div>
+      <div class="hero-stat"><div class="num amber" data-target="45" data-suffix="%">0%</div><div class="label">Lower Deploy Cost</div></div>
+      <div class="hero-stat"><div class="num purple" data-target="67" data-suffix="%">0%</div><div class="label">Higher Success Rate</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label"><i class="fas fa-route"></i> Process</div>
+      <h2 class="section-title">Your 3-Step On-Ramp</h2>
+      <p class="section-desc">From audit to deployment in weeks, not quarters. Our structured approach de-risks every step of your AI agent journey.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-num s1">01</div>
+        <h3>Agent Readiness Audit</h3>
+        <p>Benchmark your AI maturity against peers. We score your infrastructure, data readiness, and organizational alignment to build a prioritized roadmap of high-impact agent opportunities.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num s2">02</div>
+        <h3>Intelligent Matchmaking</h3>
+        <p>Our platform maps your needs against a curated network of vetted vendors. Every builder passes a 50-point technical, security, and reference audit before they see your brief.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num s3">03</div>
+        <h3>Launch & Scale</h3>
+        <p>Legal templates shave weeks off procurement. We monitor KPIs post-launch, help you scale what works, and sunset what doesn't — outcome accountability from day one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTIONS: ENTERPRISE & VENDOR -->
+<section id="solutions" style="background:var(--bg-surface)">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label"><i class="fas fa-users"></i> Who It's For</div>
+      <h2 class="section-title">Two Sides, One Marketplace</h2>
+      <p class="section-desc">Whether you're buying agent solutions or building them, GoodCombinator accelerates your pipeline.</p>
+    </div>
+    <div class="audience-grid">
+      <div class="audience-card enterprise reveal">
+        <div class="badge"><i class="fas fa-building"></i> Enterprise Buyers</div>
+        <h3>Agent-Powered Efficiency.<br>Bottom-Line Results.</h3>
+        <p class="desc">GoodCombinator finds, funds, and fast-tracks the AI agents that will matter most to your P&L — no guesswork, no endless pilots.</p>
+        <ul class="feature-list">
+          <li><i class="fas fa-check"></i> Agent Benchmarking — see how your readiness scores stack up against peers and competitors</li>
+          <li><i class="fas fa-check"></i> Opportunity Mapping — identify high-impact agent plays, prioritized by value and feasibility</li>
+          <li><i class="fas fa-check"></i> Exclusive Agent Network — matched only with builders proven to deliver at enterprise scale</li>
+          <li><i class="fas fa-check"></i> Procurement Accelerated — legal templates shave weeks off red-tape and vendor onboarding</li>
+        </ul>
+        <button class="btn btn-primary" onclick="openModal('audit')"><i class="fas fa-search"></i> Find Your Perfect Agent</button>
+      </div>
+      <div class="audience-card vendor reveal">
+        <div class="badge"><i class="fas fa-code"></i> Agent Vendors</div>
+        <h3>Skip the Tire-Kickers.<br>Talk to Buyers Ready to Buy.</h3>
+        <p class="desc">Join the Agent Marketplace and replace cold outreach with pre-funded enterprise projects that close twice as fast. Average deal value: $500k+.</p>
+        <ul class="feature-list">
+          <li><i class="fas fa-check"></i> Enterprise Access — projects are pre-qualified, scoped, and funded</li>
+          <li><i class="fas fa-check"></i> High-Intent Leads — talk only to buyers ready to buy</li>
+          <li><i class="fas fa-check"></i> Simplified Communication — one streamlined channel from intro to close</li>
+          <li><i class="fas fa-check"></i> Creator IP Protection — retain full ownership of your agent code and training data</li>
+        </ul>
+        <button class="btn btn-primary" style="background:var(--green)" onclick="openModal('pipeline')"><i class="fas fa-paper-plane"></i> Apply to the Marketplace</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASE EXPLORER -->
+<section id="explorer">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label"><i class="fas fa-layer-group"></i> Use Cases</div>
+      <h2 class="section-title">AI Agent Use Cases by Sector</h2>
+      <p class="section-desc">Explore the highest-impact agent deployments across industries. Click a sector to see real-world applications and adoption stages.</p>
+    </div>
+    <div class="explorer-container reveal" role="region" aria-label="Interactive sector use-case explorer">
+      <div class="explorer-sidebar">
+        <h4>Industries</h4>
+        <button class="sector-btn active" data-sector="healthcare"><i class="fas fa-heartbeat"></i> Healthcare</button>
+        <button class="sector-btn" data-sector="fintech"><i class="fas fa-chart-line"></i> Fintech</button>
+        <button class="sector-btn" data-sector="realestate"><i class="fas fa-home"></i> Real Estate</button>
+        <button class="sector-btn" data-sector="education"><i class="fas fa-graduation-cap"></i> Education</button>
+        <button class="sector-btn" data-sector="supply"><i class="fas fa-truck"></i> Supply Chain</button>
+      </div>
+      <div class="explorer-main" id="explorerMain">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY GOODCOMBINATOR -->
+<section style="background:var(--bg-surface)">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label"><i class="fas fa-star"></i> Differentiation</div>
+      <h2 class="section-title">Because Outcomes &gt; Hype</h2>
+      <p class="section-desc">Four reasons enterprise teams trust GoodCombinator to turn AI agent potential into production value.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="icon"><i class="fas fa-shield-halved"></i></div>
+        <h4>Proven Partners Only</h4>
+        <p>Every vendor passes a 50-point technical, security, and reference audit before joining the network.</p>
+      </div>
+      <div class="why-card reveal">
+        <div class="icon"><i class="fas fa-bullseye"></i></div>
+        <h4>Pre-Scoped Opportunities</h4>
+        <p>Crystal-clear requirements eliminate scope creep and budget shock on every engagement.</p>
+      </div>
+      <div class="why-card reveal">
+        <div class="icon"><i class="fas fa-bolt"></i></div>
+        <h4>Procurement, Accelerated</h4>
+        <p>Legal templates shave weeks off red-tape and vendor onboarding so you ship faster.</p>
+      </div>
+      <div class="why-card reveal">
+        <div class="icon"><i class="fas fa-chart-pie"></i></div>
+        <h4>Outcome Accountability</h4>
+        <p>We monitor KPIs post-launch and help you scale what works — real results, not demos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<section id="dashboard">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label"><i class="fas fa-gauge-high"></i> Dashboard</div>
+      <h2 class="section-title">Your Agent Command Center</h2>
+      <p class="section-desc">Track your opportunity backlog, peer benchmarks, RFP status, and live KPIs — all in one place. Your dedicated strategist is one click away.</p>
+    </div>
+    <div class="dashboard-preview reveal">
+      <div class="dash-header">
+        <h4><i class="fas fa-gauge-high" style="color:var(--accent);margin-right:8px"></i> Agent Readiness Dashboard</h4>
+        <div class="dash-status">
+          <div class="dash-dot" style="background:var(--green)"></div>
+          <div class="dash-dot" style="background:var(--amber)"></div>
+          <div class="dash-dot" style="background:var(--rose)"></div>
+        </div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-metric">
+          <div class="metric-label">Readiness Score</div>
+          <div class="metric-val" style="color:var(--accent)">78<span style="font-size:.9rem">/100</span></div>
+          <div class="metric-change metric-up"><i class="fas fa-arrow-up"></i> +12 from last quarter</div>
+        </div>
+        <div class="dash-metric">
+          <div class="metric-label">Active Opportunities</div>
+          <div class="metric-val" style="color:var(--green)">14</div>
+          <div class="metric-change metric-up"><i class="fas fa-arrow-up"></i> 3 new this month</div>
+        </div>
+        <div class="dash-metric">
+          <div class="metric-label">Avg. Time-to-Deploy</div>
+          <div class="metric-val" style="color:var(--amber)">6.2<span style="font-size:.9rem">wk</span></div>
+          <div class="metric-change metric-up"><i class="fas fa-arrow-down"></i> 2.1wk faster than avg</div>
+        </div>
+        <div class="dash-chart">
+          <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px;font-weight:600">Agent Deployment Pipeline — Last 12 Months</div>
+          <div class="chart-bars" id="chartBars"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="start">
+  <div class="cta-section reveal">
+    <h2>Turn Potential into Production — Today</h2>
+    <p>Whether you're buying or building AI agents, your path starts here.</p>
+    <div class="cta-buttons">
+      <button class="btn btn-primary" onclick="openModal('audit')"><i class="fas fa-rocket"></i> Launch My Audit</button>
+      <button class="btn btn-secondary" style="background:var(--green);color:#fff;border-color:var(--green)" onclick="openModal('pipeline')"><i class="fas fa-paper-plane"></i> Fast-Track My Pipeline</button>
+    </div>
+    <div class="trust-badges">
+      <div class="trust-badge"><i class="fas fa-check-circle"></i> SOC 2 Type II</div>
+      <div class="trust-badge"><i class="fas fa-check-circle"></i> GDPR-Ready</div>
+      <div class="trust-badge"><i class="fas fa-check-circle"></i> 27 Countries</div>
+      <div class="trust-badge"><i class="fas fa-check-circle"></i> 50-Point Vendor Audit</div>
+    </div>
+  </div>
+</section>
+
+<!-- INTAKE MODAL -->
+<div class="modal-overlay" id="intakeModal" aria-hidden="true" role="dialog" aria-label="Agent Readiness Audit intake form">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close form"><i class="fas fa-times"></i></button>
+
+    <div id="modalFormView">
+      <div class="modal-header">
+        <h3 id="modalTitle">Start Your Agent Readiness Audit</h3>
+        <p id="modalSubtitle">Tell us about your organization — we'll build a custom roadmap.</p>
+      </div>
+      <div class="modal-progress">
+        <div class="prog-dot active" data-step="1"></div>
+        <div class="prog-dot" data-step="2"></div>
+        <div class="prog-dot" data-step="3"></div>
+        <div class="prog-dot" data-step="4"></div>
+      </div>
+      <form id="intakeForm" action="https://formspree.io/f/xpwdqgkr" method="POST">
+        <input type="hidden" name="_subject" value="New GoodCombinator Audit Request">
+        <input type="hidden" name="form_type" id="formTypeField" value="audit">
+
+        <!-- STEP 1: Contact Basics -->
+        <div class="modal-body">
+          <div class="form-step active" data-step="1">
+            <h4><i class="fas fa-user"></i> Contact Information</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Full Name <span class="req">*</span></label>
+                <input type="text" name="name" class="form-input" placeholder="Jane Smith" required>
+                <div class="form-error">Please enter your name</div>
+              </div>
+              <div class="form-group">
+                <label>Work Email <span class="req">*</span></label>
+                <input type="email" name="email" class="form-input" placeholder="jane@company.com" required>
+                <div class="form-error">Please enter a valid work email</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Company Name <span class="req">*</span></label>
+                <input type="text" name="company" class="form-input" placeholder="Acme Corp" required>
+                <div class="form-error">Please enter your company name</div>
+              </div>
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" name="phone" class="form-input" placeholder="+1 (555) 000-0000">
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Company Profile -->
+          <div class="form-step" data-step="2">
+            <h4><i class="fas fa-building"></i> Company Profile</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Industry Vertical <span class="req">*</span></label>
+                <select name="industry" class="form-input" required>
+                  <option value="">Select industry...</option>
+                  <option value="healthcare">Healthcare</option>
+                  <option value="fintech">Fintech & Banking</option>
+                  <option value="realestate">Real Estate</option>
+                  <option value="education">Education</option>
+                  <option value="supply">Supply Chain & Logistics</option>
+                  <option value="manufacturing">Manufacturing</option>
+                  <option value="retail">Retail & E-Commerce</option>
+                  <option value="other">Other</option>
+                </select>
+                <div class="form-error">Please select your industry</div>
+              </div>
+              <div class="form-group">
+                <label>Company Size <span class="req">*</span></label>
+                <select name="company_size" class="form-input" required>
+                  <option value="">Select size...</option>
+                  <option value="1-50">1–50 employees</option>
+                  <option value="51-200">51–200 employees</option>
+                  <option value="201-1000">201–1,000 employees</option>
+                  <option value="1001-5000">1,001–5,000 employees</option>
+                  <option value="5000+">5,000+ employees</option>
+                </select>
+                <div class="form-error">Please select company size</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Annual Revenue Range</label>
+                <select name="revenue" class="form-input">
+                  <option value="">Select range...</option>
+                  <option value="<5M">Under $5M</option>
+                  <option value="5-25M">$5M – $25M</option>
+                  <option value="25-100M">$25M – $100M</option>
+                  <option value="100-500M">$100M – $500M</option>
+                  <option value="500M+">$500M+</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Current AI Maturity</label>
+                <select name="ai_maturity" class="form-input">
+                  <option value="">Select level...</option>
+                  <option value="exploring">Exploring — no AI in production</option>
+                  <option value="piloting">Piloting — 1-2 experiments running</option>
+                  <option value="scaling">Scaling — AI in some workflows</option>
+                  <option value="advanced">Advanced — AI across departments</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Agent Needs -->
+          <div class="form-step" data-step="3">
+            <h4><i class="fas fa-robot"></i> Agent Needs</h4>
+            <div class="form-group">
+              <label>Which sectors interest you? <span class="req">*</span></label>
+              <div class="checkbox-grid" id="sectorChecks">
+                <label class="checkbox-item" data-value="healthcare">
+                  <input type="checkbox" name="sectors" value="healthcare">
+                  <span class="cb-icon"><i class="fas fa-check"></i></span>
+                  <span><i class="fas fa-heartbeat" style="margin-right:4px"></i> Healthcare</span>
+                </label>
+                <label class="checkbox-item" data-value="fintech">
+                  <input type="checkbox" name="sectors" value="fintech">
+                  <span class="cb-icon"><i class="fas fa-check"></i></span>
+                  <span><i class="fas fa-chart-line" style="margin-right:4px"></i> Fintech</span>
+                </label>
+                <label class="checkbox-item" data-value="realestate">
+                  <input type="checkbox" name="sectors" value="realestate">
+                  <span class="cb-icon"><i class="fas fa-check"></i></span>
+                  <span><i class="fas fa-home" style="margin-right:4px"></i> Real Estate</span>
+                </label>
+                <label class="checkbox-item" data-value="education">
+                  <input type="checkbox" name="sectors" value="education">
+                  <span class="cb-icon"><i class="fas fa-check"></i></span>
+                  <span><i class="fas fa-graduation-cap" style="margin-right:4px"></i> Education</span>
+                </label>
+                <label class="checkbox-item" data-value="supply">
+                  <input type="checkbox" name="sectors" value="supply">
+                  <span class="cb-icon"><i class="fas fa-check"></i></span>
+                  <span><i class="fas fa-truck" style="margin-right:4px"></i> Supply Chain</span>
+                </label>
+                <label class="checkbox-item" data-value="other">
+                  <input type="checkbox" name="sectors" value="other">
+                  <span class="cb-icon"><i class="fas fa-check"></i></span>
+                  <span><i class="fas fa-ellipsis-h" style="margin-right:4px"></i> Other</span>
+                </label>
+              </div>
+              <div class="form-error" id="sectorError">Please select at least one area of interest</div>
+            </div>
+            <div class="form-group">
+              <label>Primary Pain Points</label>
+              <textarea name="pain_points" class="form-input" placeholder="What challenges are you trying to solve with AI agents? e.g. slow manual processes, high operational costs, scaling customer support..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Timeline Urgency</label>
+              <select name="timeline" class="form-input">
+                <option value="">Select timeline...</option>
+                <option value="asap">Immediate — need results this quarter</option>
+                <option value="3-6mo">3–6 months — planning phase</option>
+                <option value="6-12mo">6–12 months — budgeting cycle</option>
+                <option value="exploratory">Just exploring options</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- STEP 4: Budget & Role -->
+          <div class="form-step" data-step="4">
+            <h4><i class="fas fa-wallet"></i> Budget & Decision-Making</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Estimated Budget Range <span class="req">*</span></label>
+                <select name="budget" class="form-input" required>
+                  <option value="">Select range...</option>
+                  <option value="<50K">Under $50K</option>
+                  <option value="50-100K">$50K – $100K</option>
+                  <option value="100-250K">$100K – $250K</option>
+                  <option value="250-500K">$250K – $500K</option>
+                  <option value="500K+">$500K+</option>
+                  <option value="tbd">Not yet determined</option>
+                </select>
+                <div class="form-error">Please select a budget range</div>
+              </div>
+              <div class="form-group">
+                <label>Your Role <span class="req">*</span></label>
+                <select name="role" class="form-input" required>
+                  <option value="">Select role...</option>
+                  <option value="c-suite">C-Suite / VP</option>
+                  <option value="director">Director</option>
+                  <option value="manager">Manager</option>
+                  <option value="ic">Individual Contributor</option>
+                  <option value="consultant">Consultant / Advisor</option>
+                </select>
+                <div class="form-error">Please select your role</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Anything else we should know?</label>
+              <textarea name="notes" class="form-input" placeholder="Previous AI vendor experiences, specific compliance requirements, preferred engagement model..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" id="modalNav">
+          <button type="button" class="btn btn-ghost" id="prevBtn" onclick="prevStep()" style="display:none"><i class="fas fa-arrow-left"></i> Back</button>
+          <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next <i class="fas fa-arrow-right"></i></button>
+          <button type="submit" class="btn btn-primary" id="submitBtn" style="display:none"><i class="fas fa-paper-plane"></i> Submit Request</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h3>You're on the Launchpad!</h3>
+      <p>We've received your audit request. A GoodCombinator strategist will reach out within <strong>1 business day</strong> to schedule your personalized Agent Readiness Assessment.</p>
+      <button class="btn btn-primary" onclick="closeModal()"><i class="fas fa-thumbs-up"></i> Got It</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">GoodCombinator</div>
+      <p class="footer-tagline">The enterprise on-ramp to the agentic future. Map opportunities, match with partners, launch AI agents that deliver real ROI.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Platform</h5>
+      <a href="#how">How It Works</a>
+      <a href="#solutions">Enterprise Buyers</a>
+      <a href="#solutions">Agent Vendors</a>
+      <a href="#dashboard">Dashboard</a>
+    </div>
+    <div class="footer-col">
+      <h5>Resources</h5>
+      <a href="#explorer">Use Case Explorer</a>
+      <a href="#">Agent Readiness Audit</a>
+      <a href="#">GoodCombinator for Teams</a>
+      <a href="#">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 GoodCombinator. All rights reserved.</span>
+    <span>Good Samaritan Institute</span>
+  </div>
+</footer>
+
+<script>
+// ===== SECTOR DATA =====
+const sectors = {
+  healthcare: {
+    title: 'Healthcare',
+    icon: 'fa-heartbeat',
+    desc: 'AI agents are transforming patient care, administrative workflows, and drug discovery — reducing costs and accelerating outcomes across the healthcare value chain.',
+    cases: [
+      { name: 'AI-Driven Drug Discovery', desc: 'Analyze vast biochemical datasets to identify new drug candidates and design molecules. AI models simulate drug-target interactions in hours instead of months.', example: 'Over 50% reductions in discovery timelines for leading pharma companies.', adoption: 'early' },
+      { name: 'Automated Patient Intake & Eligibility', desc: 'Streamline onboarding by automating insurance eligibility checks and benefit breakdowns in real-time.', example: 'Regal AI Agents automate qualification, triage, and insurance queries.', adoption: 'growing' },
+      { name: 'AI-Assisted Medical Diagnostics', desc: 'Computer vision and ML agents that detect anomalies in medical images with accuracy matching or exceeding human specialists.', example: 'AI-discovered drugs are entering clinical trials; imaging AI approved by FDA.', adoption: 'early' },
+      { name: 'Clinical Decision Support Systems', desc: 'AI agents assist clinicians by providing evidence-based recommendations, alerts, and predictive care scheduling.', example: 'Agents evaluate patient data to forecast issues and organize care plans.', adoption: 'growing' },
+      { name: 'Appointment Scheduling Agents', desc: 'Manage bookings, rescheduling, and reminders through natural language interactions with patients.', example: 'AI syncs with provider calendars, automates outreach, enables conversational scheduling.', adoption: 'mature' }
+    ]
+  },
+  fintech: {
+    title: 'Fintech & Banking',
+    icon: 'fa-chart-line',
+    desc: 'From fraud detection to personalized advisory, AI agents are reshaping financial services with faster decisions, better risk management, and superior customer experiences.',
+    cases: [
+      { name: 'Fraud Detection & Prevention', desc: 'Analyze transaction patterns in real-time to identify and prevent fraudulent activities before they impact customers.', example: 'AI agents detect advanced threats by analyzing massive datasets to predict demand and identify anomalies.', adoption: 'mature' },
+      { name: 'Conversational AI for Banking', desc: 'Handle customer inquiries with instant, personalized support — from balance checks to investment advice.', example: "Bank of America's Erica handles millions of queries, reducing call center load.", adoption: 'mature' },
+      { name: 'Credit Scoring & Risk Assessment', desc: 'Evaluate creditworthiness using diverse data sources and advanced ML models for more accurate lending decisions.', example: 'AI agents run simulations and scenario analyses to estimate risks and detect violations.', adoption: 'growing' },
+      { name: 'Algorithmic Trading Agents', desc: 'Execute trades at optimal timing using real-time market analysis, sentiment data, and predictive models.', example: 'Hedge funds deploying AI trading agents report improved Sharpe ratios.', adoption: 'early' },
+      { name: 'Regulatory Compliance Automation', desc: 'Monitor transactions and reporting for compliance with evolving regulations, reducing manual review burden.', example: 'Automated KYC/AML screening cuts compliance review time by 60%.', adoption: 'growing' }
+    ]
+  },
+  realestate: {
+    title: 'Real Estate',
+    icon: 'fa-home',
+    desc: 'AI agents are optimizing property valuations, tenant services, and maintenance operations — making real estate management smarter and more efficient.',
+    cases: [
+      { name: 'Automated Property Valuation', desc: 'Assess property values using market data, comparable sales, and predictive analytics for accurate real-time pricing.', example: 'AI algorithms analyze local sales records and demographic trends for granular valuations.', adoption: 'growing' },
+      { name: 'Predictive Maintenance Scheduling', desc: 'Monitor building systems and predict maintenance needs before failures occur, reducing downtime and costs.', example: 'AI agents analyze IoT sensor data to schedule maintenance proactively.', adoption: 'early' },
+      { name: 'Personalized Tenant Services', desc: 'Virtual concierge agents offering customized services, virtual tours, and tailored property recommendations.', example: 'AI chatbots provide personalized assistance, improving engagement in leasing.', adoption: 'growing' },
+      { name: 'Lead Qualification & Nurturing', desc: 'AI agents qualify inbound leads, schedule showings, and maintain personalized follow-up sequences.', example: 'Brokerages report 40% more qualified appointments with AI pre-screening.', adoption: 'growing' }
+    ]
+  },
+  education: {
+    title: 'Education',
+    icon: 'fa-graduation-cap',
+    desc: 'From personalized tutoring to administrative automation, AI agents are enabling educators to focus on what matters — teaching and mentorship.',
+    cases: [
+      { name: 'AI-Powered Tutoring Systems', desc: 'Provide personalized tutoring that adapts to individual learning styles, pace, and knowledge gaps.', example: "Kira Learning's AI agents handle grading and lesson planning, freeing educators to mentor.", adoption: 'growing' },
+      { name: 'Automated Administrative Tasks', desc: 'Manage scheduling, resource allocation, enrollment processing, and institutional reporting.', example: 'AI streamlines admin functions, enabling educators to concentrate on teaching.', adoption: 'growing' },
+      { name: 'Enhanced Student Assessment', desc: 'Evaluate performance in real-time, providing immediate feedback and identifying students who need intervention.', example: 'AI agents analyze student data to assess understanding and guide instructional strategies.', adoption: 'early' },
+      { name: 'Curriculum Design Assistants', desc: 'AI agents help educators design adaptive curricula aligned with learning objectives and student outcomes.', example: 'Personalized learning paths generated from student performance data.', adoption: 'early' }
+    ]
+  },
+  supply: {
+    title: 'Supply Chain',
+    icon: 'fa-truck',
+    desc: 'AI agents optimize every link in the supply chain — from demand forecasting to last-mile delivery — building resilience and reducing waste.',
+    cases: [
+      { name: 'Demand Forecasting & Inventory', desc: 'Predict demand patterns using historical data, market signals, and external factors to optimize inventory levels.', example: "Walmart's AI-driven demand planning reduced excess inventory by 20%.", adoption: 'mature' },
+      { name: 'Logistics & Route Optimization', desc: 'Determine optimal delivery routes and schedules considering traffic, weather, capacity, and cost constraints.', example: 'AI agents analyze logistics data to optimize routes, improving supply chain responsiveness.', adoption: 'growing' },
+      { name: 'Supplier Risk Management', desc: 'Continuously monitor supplier health, geopolitical risks, and market conditions to preempt disruptions.', example: 'AI predicts multi-tier supply chain risks, aiding proactive risk assessment.', adoption: 'early' },
+      { name: 'Warehouse Automation Agents', desc: 'Coordinate robotic picking, packing, and sorting operations with intelligent task prioritization.', example: 'Amazon deploys over 750,000 AI-coordinated robots across fulfillment centers.', adoption: 'mature' }
+    ]
+  }
+};
+
+// ===== EXPLORER RENDER =====
+function renderSector(key) {
+  const s = sectors[key];
+  if (!s) { console.warn('Unknown sector:', key); return; }
+  const main = document.getElementById('explorerMain');
+  const adoptionLabel = { early: 'Early Adoption', growing: 'Growing', mature: 'Mature' };
+  const adoptionClass = { early: 'adoption-early', growing: 'adoption-growing', mature: 'adoption-mature' };
+  main.innerHTML = `
+    <h3><i class="fas ${s.icon}" style="color:var(--accent);margin-right:8px"></i> ${s.title}</h3>
+    <p class="sector-desc">${s.desc}</p>
+    ${s.cases.map(c => `
+      <div class="case-item">
+        <h5>${c.name} <span class="adoption-badge ${adoptionClass[c.adoption]}">${adoptionLabel[c.adoption]}</span></h5>
+        <p>${c.desc}</p>
+        <div class="example"><i class="fas fa-lightbulb" style="margin-right:4px"></i> ${c.example}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+document.querySelectorAll('.sector-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderSector(btn.dataset.sector);
+  });
+});
+renderSector('healthcare');
+
+// ===== CHART BARS =====
+const months = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+const vals = [22,28,35,31,42,48,55,61,58,72,68,85];
+const chartBars = document.getElementById('chartBars');
+months.forEach((m, i) => {
+  const bar = document.createElement('div');
+  bar.className = 'chart-bar';
+  bar.style.height = '0%';
+  bar.style.background = `linear-gradient(to top, var(--accent), var(--purple))`;
+  bar.innerHTML = `<span class="bar-label">${m}</span>`;
+  chartBars.appendChild(bar);
+  setTimeout(() => { bar.style.height = vals[i] + '%'; }, 300 + i * 80);
+});
+
+// ===== COUNTER ANIMATION =====
+function animateCounters() {
+  document.querySelectorAll('.hero-stat .num').forEach(el => {
+    const target = parseFloat(el.dataset.target);
+    const prefix = el.dataset.prefix || '';
+    const suffix = el.dataset.suffix || '';
+    const isDecimal = target % 1 !== 0;
+    const duration = 1800;
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = target * eased;
+      el.textContent = prefix + (isDecimal ? current.toFixed(1) : Math.round(current)) + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// ===== SCROLL NAV =====
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('nav');
+  if (window.scrollY > 60) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+  lastScroll = window.scrollY;
+});
+
+// ===== NAV ACTIVE STATE =====
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 200) current = s.id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+// ===== REVEAL ON SCROLL =====
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== HERO COUNTER ON LOAD =====
+const heroObserver = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) { animateCounters(); heroObserver.disconnect(); }
+}, { threshold: 0.3 });
+heroObserver.observe(document.querySelector('.hero'));
+
+// ===== MOBILE NAV =====
+function toggleMobile() {
+  const nav = document.getElementById('mobileNav');
+  nav.classList.toggle('open');
+  nav.setAttribute('aria-hidden', !nav.classList.contains('open'));
+}
+
+// ===== SMOOTH SCROLL (renamed to avoid shadowing window.scrollTo) =====
+function smoothScroll(sel) {
+  const el = document.querySelector(sel);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Mobile nav: close overlay first, then smooth-scroll after a short delay
+function mobileNav(e, sel) {
+  if (e && e.preventDefault) e.preventDefault();
+  const nav = document.getElementById('mobileNav');
+  nav.classList.remove('open');
+  nav.setAttribute('aria-hidden', 'true');
+  setTimeout(() => smoothScroll(sel), 300);
+}
+
+// ===== CTA CONFIRM =====
+function showCtaConfirm(e, type) {
+  const btn = e.currentTarget;
+  const original = btn.innerHTML;
+  if (type === 'audit') {
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Request Received — We\'ll Be in Touch!';
+    btn.style.background = 'var(--green)';
+  } else {
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Application Submitted!';
+    btn.style.background = 'var(--accent)';
+  }
+  btn.disabled = true;
+  btn.style.opacity = '0.85';
+  setTimeout(() => {
+    btn.innerHTML = original;
+    btn.style.background = '';
+    btn.style.opacity = '';
+    btn.disabled = false;
+  }, 3000);
+}
+
+// Close mobile nav on resize
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    const nav = document.getElementById('mobileNav');
+    nav.classList.remove('open');
+    nav.setAttribute('aria-hidden', 'true');
+  }
+});
+
+// ===== INTAKE MODAL =====
+let currentStep = 1;
+const totalSteps = 4;
+
+function openModal(type) {
+  const modal = document.getElementById('intakeModal');
+  const title = document.getElementById('modalTitle');
+  const subtitle = document.getElementById('modalSubtitle');
+  const formType = document.getElementById('formTypeField');
+
+  if (type === 'pipeline') {
+    title.textContent = 'Fast-Track Your Pipeline';
+    subtitle.textContent = 'Join the Agent Marketplace — connect with pre-funded enterprise projects.';
+    formType.value = 'pipeline';
+  } else {
+    title.textContent = 'Start Your Agent Readiness Audit';
+    subtitle.textContent = "Tell us about your organization — we'll build a custom roadmap.";
+    formType.value = 'audit';
+  }
+
+  currentStep = 1;
+  updateStepUI();
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  // Reset form and success state
+  document.getElementById('modalFormView').style.display = '';
+  document.getElementById('modalSuccess').classList.remove('active');
+  document.getElementById('intakeForm').reset();
+  document.querySelectorAll('.checkbox-item').forEach(c => c.classList.remove('checked'));
+  document.querySelectorAll('.form-input.error').forEach(i => i.classList.remove('error'));
+  document.querySelectorAll('.form-error.show').forEach(e => e.classList.remove('show'));
+
+  // Focus first input after animation
+  setTimeout(() => {
+    const first = document.querySelector('.form-step.active .form-input');
+    if (first) first.focus();
+  }, 350);
+}
+
+function closeModal() {
+  const modal = document.getElementById('intakeModal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.getElementById('intakeModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('intakeModal').classList.contains('open')) {
+    closeModal();
+  }
+});
+
+function updateStepUI() {
+  // Steps
+  document.querySelectorAll('.form-step').forEach(s => {
+    const step = parseInt(s.dataset.step);
+    s.classList.toggle('active', step === currentStep);
+  });
+
+  // Progress dots
+  document.querySelectorAll('.prog-dot').forEach(d => {
+    const step = parseInt(d.dataset.step);
+    d.classList.remove('active', 'done');
+    if (step === currentStep) d.classList.add('active');
+    else if (step < currentStep) d.classList.add('done');
+  });
+
+  // Buttons
+  document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : '';
+  document.getElementById('nextBtn').style.display = currentStep === totalSteps ? 'none' : '';
+  document.getElementById('submitBtn').style.display = currentStep === totalSteps ? '' : 'none';
+}
+
+function validateStep(step) {
+  let valid = true;
+  const stepEl = document.querySelector(`.form-step[data-step="${step}"]`);
+
+  // Clear previous errors
+  stepEl.querySelectorAll('.form-input.error').forEach(i => i.classList.remove('error'));
+  stepEl.querySelectorAll('.form-error.show').forEach(e => e.classList.remove('show'));
+
+  // Validate required inputs and selects
+  stepEl.querySelectorAll('.form-input[required]').forEach(input => {
+    if (!input.value.trim()) {
+      input.classList.add('error');
+      const err = input.closest('.form-group').querySelector('.form-error');
+      if (err) err.classList.add('show');
+      valid = false;
+    }
+    // Email validation
+    if (input.type === 'email' && input.value.trim()) {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(input.value.trim())) {
+        input.classList.add('error');
+        const err = input.closest('.form-group').querySelector('.form-error');
+        if (err) err.classList.add('show');
+        valid = false;
+      }
+    }
+  });
+
+  // Step 3: at least one sector checkbox required
+  if (step === 3) {
+    const checked = stepEl.querySelectorAll('.checkbox-item.checked');
+    if (checked.length === 0) {
+      document.getElementById('sectorError').classList.add('show');
+      valid = false;
+    }
+  }
+
+  return valid;
+}
+
+function nextStep() {
+  if (!validateStep(currentStep)) return;
+  if (currentStep < totalSteps) {
+    currentStep++;
+    updateStepUI();
+    // Focus first input
+    setTimeout(() => {
+      const first = document.querySelector('.form-step.active .form-input');
+      if (first) first.focus();
+    }, 100);
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    updateStepUI();
+  }
+}
+
+// Checkbox toggle — prevent native label behavior, manage state in JS
+document.querySelectorAll('.checkbox-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    item.classList.toggle('checked');
+    const cb = item.querySelector('input[type="checkbox"]');
+    cb.checked = item.classList.contains('checked');
+    // Clear error if at least one selected
+    if (document.querySelectorAll('.checkbox-item.checked').length > 0) {
+      document.getElementById('sectorError').classList.remove('show');
+    }
+  });
+});
+
+// Clear error on input
+document.querySelectorAll('#intakeForm .form-input').forEach(input => {
+  input.addEventListener('input', () => {
+    input.classList.remove('error');
+    const err = input.closest('.form-group')?.querySelector('.form-error');
+    if (err) err.classList.remove('show');
+  });
+  input.addEventListener('change', () => {
+    input.classList.remove('error');
+    const err = input.closest('.form-group')?.querySelector('.form-error');
+    if (err) err.classList.remove('show');
+  });
+});
+
+// Form submission via Formspree
+document.getElementById('intakeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!validateStep(currentStep)) return;
+
+  const form = e.target;
+  const submitBtn = document.getElementById('submitBtn');
+  const originalHTML = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+  submitBtn.disabled = true;
+
+  // Gather checked sectors into a comma-separated string
+  const checkedSectors = Array.from(document.querySelectorAll('.checkbox-item.checked'))
+    .map(item => item.dataset.value).join(', ');
+
+  const formData = new FormData(form);
+  // Replace checkbox data with clean string
+  formData.delete('sectors');
+  formData.set('sectors_interest', checkedSectors);
+
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (response.ok) {
+      document.getElementById('modalFormView').style.display = 'none';
+      document.getElementById('modalSuccess').classList.add('active');
+    } else {
+      throw new Error('Submission failed');
+    }
+  } catch (err) {
+    submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error — Try Again';
+    submitBtn.style.background = 'var(--rose)';
+    submitBtn.disabled = false;
+    setTimeout(() => {
+      submitBtn.innerHTML = originalHTML;
+      submitBtn.style.background = '';
+    }, 3000);
+  }
+});
+</script>
+</body>
+</html>
